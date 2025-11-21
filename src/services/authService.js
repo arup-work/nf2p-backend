@@ -1,5 +1,6 @@
 import User from "../models/User.js"
 import bcrypt from 'bcrypt';
+import emailQueue from "../utils/emailQueue.js";
 
 // A function check if email is exist in your DB
 const emailExists = async (email) => {
@@ -18,10 +19,17 @@ export default class AuthService {
         const saltRound = 10;
         const hashedPassword = await bcrypt.hash(password, saltRound);
 
-        const user = await User.create({
+        await User.create({
             name,
             email,
             password: hashedPassword
+        })
+
+        await emailQueue.add({
+            email,
+            subject: 'Successfully registration complete',
+            template: 'registrationSuccessMail.ejs',
+            context : {name}
         })
 
         return {
