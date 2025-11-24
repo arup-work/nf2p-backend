@@ -1,7 +1,7 @@
 import express from "express"
 import { validateRequest } from "../middleware/validateRequest.js";
-import { registerSchema } from "../validation/userSchema.js";
-import AuthController from "../controllers/AuthController.js";
+import { loginSchema, registerSchema } from "../validation/userSchema.js";
+import AuthController from "../controllers/authController.js";
 
 const authRoute = express.Router();
 
@@ -10,6 +10,12 @@ authRoute.post(
     '/register',
     validateRequest(registerSchema),
     AuthController.register
+)
+// Login
+authRoute.post(
+    '/login',
+    validateRequest(loginSchema),
+    AuthController.login
 )
 
 export default authRoute;
