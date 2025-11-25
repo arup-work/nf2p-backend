@@ -35,4 +35,17 @@ export default class AuthController {
             res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
         }
     }
+
+    static async forgotPassword(req, res, next) {
+        try {
+            const { email } = req.body;
+            const forgotPassword = await AuthService.forgotPassword(email); 
+            return res.status(200).json({
+                message: 'A password reset link has been sent to your registered email address.',
+                statusCode: 2000
+            });
+        } catch (error) {
+            res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
+        }
+    }
 }

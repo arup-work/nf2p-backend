@@ -1,6 +1,6 @@
 import express from "express"
 import { validateRequest } from "../middleware/validateRequest.js";
-import { loginSchema, registerSchema } from "../validation/userSchema.js";
+import { forgotPasswordSchema, loginSchema, registerSchema } from "../validation/userSchema.js";
 import AuthController from "../controllers/authController.js";
 
 const authRoute = express.Router();
@@ -16,6 +16,12 @@ authRoute.post(
     '/login',
     validateRequest(loginSchema),
     AuthController.login
+)
+// Forgot password
+authRoute.post(
+    '/forgot-password',
+    validateRequest(forgotPasswordSchema),
+    AuthController.forgotPassword
 )
 
 export default authRoute;
