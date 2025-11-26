@@ -14,3 +14,7 @@ export const loginSchema = z.object({
 export const forgotPasswordSchema = z.object({
     email: z.email(),
 })
+
+export const resetPasswordSchema = z.object({
+     password: z.string().max(255).min(8)
+})

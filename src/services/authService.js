@@ -101,4 +101,41 @@ export default class AuthService {
 
 
     }
+
+    static async resetPassword(token, password) {
+        if (!token || !password) {
+            throw new Error('Token and password are required');
+        }
+
+        // Validate password strength
+        if (password.length < 8) {
+            throw new Error('Password must be at least 8 characters');
+        }
+
+        // Hash the incoming token to compare
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+        console.log({$gt: Date.now()});
+
+        const user = await User.findOne({
+            resetPasswordToken: hashedToken,
+            resetPasswordExpires: { $gt: Date.now() } // not expired
+        });
+
+        console.log(user);
+        
+
+        if (!user) {
+            throw new Error("Password reset token is invalid or has expired");
+        }
+
+        // Update password
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(password, salt);
+
+        // Clear token fields
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+        return user;
+    }
 }

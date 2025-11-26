@@ -48,4 +48,18 @@ export default class AuthController {
             res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
         }
     }
+
+    static async resetPassword(req, res, next) {
+        try {
+            const { token } = req.params;
+            const { password } = req.body;
+            await AuthService.resetPassword(token, password);
+            return res.status(200).json({
+                message: 'Password reset successful',
+                statusCode: 2000
+            });
+        } catch (error) {
+             return res.status(400).json({ statusCode: 400, message: error.message });
+        }
+    }
 }

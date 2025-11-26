@@ -1,6 +1,6 @@
 import express from "express"
 import { validateRequest } from "../middleware/validateRequest.js";
-import { forgotPasswordSchema, loginSchema, registerSchema } from "../validation/userSchema.js";
+import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from "../validation/userSchema.js";
 import AuthController from "../controllers/authController.js";
 
 const authRoute = express.Router();
@@ -22,6 +22,12 @@ authRoute.post(
     '/forgot-password',
     validateRequest(forgotPasswordSchema),
     AuthController.forgotPassword
+)
+// Reset password
+authRoute.post(
+    '/reset-password/:token',
+    validateRequest(resetPasswordSchema),
+    AuthController.resetPassword
 )
 
 export default authRoute;
