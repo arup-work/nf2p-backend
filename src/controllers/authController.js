@@ -45,7 +45,7 @@ export default class AuthController {
                 statusCode: 2000
             });
         } catch (error) {
-            res.status(500).json({ statusCode: 500, message: 'Server error', error: error.message });
+            res.status(500).json({ statusCode: 500, message: error.message, error: error.message });
         }
     }
 

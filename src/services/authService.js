@@ -75,7 +75,7 @@ export default class AuthService {
     static async forgotPassword(email) {
         const userDetails = await userDetailsByEmail(email);
         if (!userDetails) {
-            throw new Error("Invalid email");
+            throw new Error("The selected email is invalid.");
         }
 
         // Generate secure token
