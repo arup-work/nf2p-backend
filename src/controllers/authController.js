@@ -24,8 +24,10 @@ export default class AuthController {
             const loginDetails = await AuthService.login(email, password);
             return res.status(200).json({
                 message: "Login successfully",
-                user: loginDetails.user,
-                token: loginDetails.token,
+                data: {
+                    user: loginDetails.user,
+                    token: loginDetails.token,
+                },
                 statusCode: 200,
             })
         } catch (error) {
@@ -39,7 +41,7 @@ export default class AuthController {
     static async forgotPassword(req, res, next) {
         try {
             const { email } = req.body;
-            const forgotPassword = await AuthService.forgotPassword(email); 
+            const forgotPassword = await AuthService.forgotPassword(email);
             return res.status(200).json({
                 message: 'A password reset link has been sent to your registered email address.',
                 statusCode: 2000
@@ -59,7 +61,7 @@ export default class AuthController {
                 statusCode: 2000
             });
         } catch (error) {
-             return res.status(400).json({ statusCode: 400, message: error.message });
+            return res.status(400).json({ statusCode: 400, message: error.message });
         }
     }
 }
