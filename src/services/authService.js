@@ -17,7 +17,7 @@ const userDetailsByEmail = async (email) => {
 }
 
 export default class AuthService {
-    static async register(name, email, password) {
+    static async register(firstName, lastName, email, password) {
         const emailAlreadyExist = await emailExists(email);
         if (emailAlreadyExist) {
             throw new Error('Email already exist');
@@ -28,7 +28,8 @@ export default class AuthService {
         const hashedPassword = await bcrypt.hash(password, saltRound);
 
         await User.create({
-            name,
+            firstName,
+            lastName,
             email,
             password: hashedPassword
         })
@@ -37,11 +38,11 @@ export default class AuthService {
             email,
             subject: 'Successfully registration complete',
             template: 'registrationSuccessMail.ejs',
-            context: { name }
+            context: { name: firstName }
         })
 
         return {
-            user: name, email
+            user: firstName, lastName, email
         }
     }
 
@@ -61,14 +62,14 @@ export default class AuthService {
 
 
         const token = JWT.sign(
-            { email },
+            { id: userDetails._id },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
         return {
             token,
-            user: { id: userDetails._id, name: userDetails.name, email: userDetails.email }
+            user: { id: userDetails._id, firstName: userDetails.firstName, lastName: userDetails.lastName, email: userDetails.email }
         }
     }
 
@@ -114,15 +115,11 @@ export default class AuthService {
 
         // Hash the incoming token to compare
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-        console.log({$gt: Date.now()});
 
         const user = await User.findOne({
             resetPasswordToken: hashedToken,
             resetPasswordExpires: { $gt: Date.now() } // not expired
         });
-
-        console.log(user);
-        
 
         if (!user) {
             throw new Error("Password reset token is invalid or has expired");

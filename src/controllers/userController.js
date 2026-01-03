@@ -1,0 +1,49 @@
+import { success } from "zod";
+import userService from "../services/userService.js";
+
+export default class UserController {
+    static async me(req, res) {
+        try {
+            const userDetails = await userService.me(req);
+            return res.status(200).json({
+                success: true,
+                message: "",
+                data: userDetails,
+                statusCode: 200
+            })
+        } catch (error) {
+
+        }
+    }
+    static async updateProfile(req, res) {
+        try {
+            const userDetails = await userService.updateProfile(req);
+            return res.status(200).json({
+                success: true,
+                message: "Profile updated successfully",
+                data: userDetails,
+                statusCode: 200
+            })
+        } catch (error) {
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    static async updatePassword(req, res) {
+        try {
+            await userService.updatePassword(req);
+            return res.status(200).json({
+                success: true,
+                message: "Password updated successfully",
+                data: '',
+                statusCode: 200
+            })
+        } catch (error) {
+            res.status(500).json({ 
+                success: false,
+                message: error.message || 'Server error' 
+            });
+        }
+    }
+
+
+}
