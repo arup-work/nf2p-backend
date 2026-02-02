@@ -22,11 +22,20 @@ export default class AuthController {
         try {
             const { email, password } = req.body;
             const loginDetails = await AuthService.login(email, password);
+
+            // Set httpOnly refresh token cookie
+            res.cookie('refreshToken',loginDetails.refreshToken,{
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+                path: '/'
+            })
             return res.status(200).json({
                 message: "Login successfully",
                 data: {
                     user: loginDetails.user,
-                    token: loginDetails.token,
+                    token: loginDetails.accessToken,
                 },
                 statusCode: 200,
             })

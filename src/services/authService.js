@@ -60,16 +60,29 @@ export default class AuthService {
             throw new Error("Invalid credential");
         }
 
-
-        const token = JWT.sign(
+        // Access token - short lived
+        const accessToken = JWT.sign(
             { id: userDetails._id },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
+        // Refresh token - long lived
+        const refreshToken = JWT.sign(
+            { id: userDetails._id },
+            process.env.JWT_REFRESH_SECRET,     // ← different secret! Very important
+            { expiresIn: '30d' }
+        );
+
         return {
-            token,
-            user: { id: userDetails._id, firstName: userDetails.firstName, lastName: userDetails.lastName, email: userDetails.email }
+            accessToken,
+            refreshToken,
+            user: {
+                id: userDetails._id,
+                firstName: userDetails.firstName,
+                lastName: userDetails.lastName,
+                email: userDetails.email
+            }
         }
     }
 
