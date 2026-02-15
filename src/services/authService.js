@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import emailQueue from "../utils/emailQueue.js";
 import JWT from 'jsonwebtoken';
 import crypto from 'crypto';
+import { jwt } from "zod";
 
 // A function check if email is exist in your DB
 const emailExists = async (email) => {
@@ -147,5 +148,35 @@ export default class AuthService {
         user.resetPasswordExpires = undefined;
         await user.save();
         return user;
+    }
+
+
+    static async refreshToken(refreshToken) {
+        //Verify the refresh token
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+        // Find the user
+        const user = await User.findById(decoded.id).select('-password');
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        // Create new access token
+        const newAccessToken = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        )
+
+        // Optional: Rotate refresh token (recommended for security)
+        const newRefreshToken = jwt.sign(
+            { id: user._id },
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: '30d' }
+        );
+
+        // Set new refresh cookie
+        
     }
 }

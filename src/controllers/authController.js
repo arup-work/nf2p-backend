@@ -73,4 +73,15 @@ export default class AuthController {
             return res.status(400).json({ statusCode: 400, message: error.message });
         }
     }
+
+    static async refreshToken(req,res, next) {
+        try {
+            const refreshToken = req.cookies.refreshToken;
+            if (!refreshToken) {
+                return res.status(401).json({ message: 'No refresh token provided' })
+            }
+        } catch (error) {
+            
+        }
+    }
 }
