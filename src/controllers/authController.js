@@ -22,9 +22,11 @@ export default class AuthController {
         try {
             const { email, password } = req.body;
             const loginDetails = await AuthService.login(email, password);
+            console.log(loginDetails);
+
 
             // Set httpOnly refresh token cookie
-            res.cookie('refreshToken',loginDetails.refreshToken,{
+            res.cookie('refreshToken', loginDetails.refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
@@ -74,14 +76,33 @@ export default class AuthController {
         }
     }
 
-    static async refreshToken(req,res, next) {
+    static async refresh(req, res, next) {
         try {
             const refreshToken = req.cookies.refreshToken;
             if (!refreshToken) {
                 return res.status(401).json({ message: 'No refresh token provided' })
             }
+            const userDetails = await AuthService.refresh(refreshToken);
+            // Set new refresh cookie
+            res.cookie('refreshToken', userDetails.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 30 * 24 * 60 * 60 * 1000 //30 days
+            })
+
+            return res.status(200).json({
+                message: "Access token successfully refreshed",
+                data: {
+                    user: userDetails.user,
+                    token: userDetails.accessToken,
+                },
+                statusCode: 200,
+            })
         } catch (error) {
-            
+            res.clearCookie('refreshToken');
+            console.log(error)
+            return res.status(401).json({ message: 'Invalid or expired refresh token' });
         }
     }
 }

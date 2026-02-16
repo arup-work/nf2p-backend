@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import emailQueue from "../utils/emailQueue.js";
 import JWT from 'jsonwebtoken';
 import crypto from 'crypto';
-import { jwt } from "zod";
 
 // A function check if email is exist in your DB
 const emailExists = async (email) => {
@@ -151,9 +150,9 @@ export default class AuthService {
     }
 
 
-    static async refreshToken(refreshToken) {
+    static async refresh(refreshToken) {
         //Verify the refresh token
-        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const decoded = JWT.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
         // Find the user
         const user = await User.findById(decoded.id).select('-password');
@@ -163,20 +162,30 @@ export default class AuthService {
         }
 
         // Create new access token
-        const newAccessToken = jwt.sign(
+        const newAccessToken = JWT.sign(
             { id: user._id },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '1h' }  //1 hour
         )
 
         // Optional: Rotate refresh token (recommended for security)
-        const newRefreshToken = jwt.sign(
+        const newRefreshToken = JWT.sign(
             { id: user._id },
             process.env.JWT_REFRESH_SECRET,
             { expiresIn: '30d' }
         );
 
-        // Set new refresh cookie
-        
+        // Send new access token + optionally user data
+        return {
+            accessToken: newAccessToken,
+            refreshToken : newRefreshToken,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email
+            }
+        }
+
     }
 }

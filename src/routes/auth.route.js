@@ -30,4 +30,10 @@ authRoute.post(
     AuthController.resetPassword
 )
 
+//Refresh token
+authRoute.post(
+    '/refresh',
+    AuthController.refresh
+)
+
 export default authRoute;
