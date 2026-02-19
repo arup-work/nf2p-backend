@@ -38,11 +38,24 @@ export default class UserController {
                 statusCode: 200
             })
         } catch (error) {
-            res.status(500).json({ 
+            res.status(500).json({
                 success: false,
-                message: error.message || 'Server error' 
+                message: error.message || 'Server error'
             });
         }
+    }
+    static async logout(req, res, next) {
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+            return res.status(401).json({ message: 'No refresh token provided' })
+        }
+        const userDetails = await AuthService.logout(refreshToken);
+        res.clearCookie('refreshToken');
+        return res.status(200).json({
+            message: "You have been logout",
+            data: {},
+            statusCode: 200,
+        })
     }
 
 

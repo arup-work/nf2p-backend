@@ -1,5 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from 'bcrypt';
+import JWT from 'jsonwebtoken';
+
 
 export default class userService {
     static async me(req) {
@@ -81,6 +83,18 @@ export default class userService {
 
         await user.save();
         return true;
+    }
+
+    static async logout(refreshToken) {
+        //Verify the refresh token
+        const decoded = JWT.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+        // Find the user
+        const user = await User.findById(decoded.id).select('-password');
+
+        if (!user) {
+            throw new Error("User not found");
+        }
     }
 
 }

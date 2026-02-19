@@ -26,4 +26,10 @@ userRoute.put(
     UserController.updatePassword
 )
 
+userRoute.post(
+    '/logout',
+    protect,
+    UserController.logout
+)
+
 export default userRoute;
