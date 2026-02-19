@@ -103,7 +103,7 @@ export default class AuthService {
         userDetails.save();
 
         const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-        const context = { resetURL, name: userDetails.name };
+        const context = { resetURL, name: `${userDetails.firstName} ${userDetails.lastName}` };
         await emailQueue.add({
             email,
             subject: "Password Reset",
@@ -187,5 +187,17 @@ export default class AuthService {
             }
         }
 
+    }
+
+    static async logout(refreshToken){
+        //Verify the refresh token
+        const decoded = JWT.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+        // Find the user
+        const user = await User.findById(decoded.id).select('-password');
+
+        if (!user) {
+            throw new Error("User not found");
+        }
     }
 }
