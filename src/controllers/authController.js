@@ -1,3 +1,4 @@
+import { success } from "zod";
 import AuthService from "../services/authService.js";
 
 export default class AuthController {
@@ -22,9 +23,7 @@ export default class AuthController {
         try {
             const { email, password } = req.body;
             const loginDetails = await AuthService.login(email, password);
-            console.log(loginDetails);
-
-
+            
             // Set httpOnly refresh token cookie
             res.cookie('refreshToken', loginDetails.refreshToken, {
                 httpOnly: true,
@@ -80,7 +79,11 @@ export default class AuthController {
         try {
             const refreshToken = req.cookies.refreshToken;
             if (!refreshToken) {
-                return res.status(401).json({ message: 'No refresh token provided' })
+                return res.status(401).json({
+                    message: 'No refresh token provided',
+                    data: {},
+                    success: false
+                })
             }
             const userDetails = await AuthService.refresh(refreshToken);
             // Set new refresh cookie
@@ -98,11 +101,15 @@ export default class AuthController {
                     token: userDetails.accessToken,
                 },
                 statusCode: 200,
+                success: true
             })
         } catch (error) {
             res.clearCookie('refreshToken');
-            console.log(error)
-            return res.status(401).json({ message: 'Invalid or expired refresh token' });
+            return res.status(401).json({
+                message: 'Invalid or expired refresh token',
+                data: {},
+                success: false
+            })
         }
     }
 }

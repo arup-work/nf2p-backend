@@ -86,14 +86,15 @@ export default class userService {
     }
 
     static async logout(refreshToken) {
-        //Verify the refresh token
-        const decoded = JWT.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-        // Find the user
-        const user = await User.findById(decoded.id).select('-password');
-
-        if (!user) {
-            throw new Error("User not found");
+        // Verify it still exists / is valid
+        try {
+            //Verify the refresh token
+            const decoded = JWT.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+            return true;
+        } catch (error) {
+            // If refresh token is already invalid/expired → just clear cookie
+            res.clearCookie('refreshToken',{ httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production' });
+            throw new Error("Logged out successfully");
         }
     }
 

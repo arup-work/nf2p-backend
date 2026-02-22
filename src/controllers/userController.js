@@ -49,12 +49,21 @@ export default class UserController {
         if (!refreshToken) {
             return res.status(401).json({ message: 'No refresh token provided' })
         }
-        const userDetails = await AuthService.logout(refreshToken);
-        res.clearCookie('refreshToken');
+        await userService.logout(refreshToken);
+
+        // Clear the refresh token cookie
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production',
+            path: '/'
+        });
+
         return res.status(200).json({
-            message: "You have been logout",
+            message: "You have been logged out",
             data: {},
             statusCode: 200,
+            success: true
         })
     }
 
