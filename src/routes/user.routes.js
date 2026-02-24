@@ -15,7 +15,7 @@ userRoute.get(
 userRoute.put(
     '/profile',
     protect,
-    validateRequest(updateProfileSchema),
+    // validateRequest(updateProfileSchema),
     UserController.updateProfile
 )
 
