@@ -59,6 +59,27 @@ export default class userService {
             res.status(500).json({ message: error.message });
         }
     }
+
+    static async uploadProfilePicture(req) {
+        const filePath = `/uploads/profiles/${req.file.fileName}`;
+        try {
+            const user = await User.findByIdAndUpdate(
+                req.user._id,
+                { profilePicture: filePath },
+                { new: true }
+            ).select(
+                '-password -createdAt -updatedAt -__v -resetPasswordExpires -resetPasswordToken'
+            );
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            return user;
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+
+    }
+
     static async updatePassword(req) {
         const { currentPassword, newPassword } = req.body;
         const userId = req.user._id;
@@ -93,7 +114,7 @@ export default class userService {
             return true;
         } catch (error) {
             // If refresh token is already invalid/expired → just clear cookie
-            res.clearCookie('refreshToken',{ httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production' });
+            res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production' });
             throw new Error("Logged out successfully");
         }
     }

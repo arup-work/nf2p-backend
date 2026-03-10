@@ -1,5 +1,6 @@
 import { success } from "zod";
 import userService from "../services/userService.js";
+import User from "../models/User.js";
 
 export default class UserController {
     static async me(req, res) {
@@ -65,6 +66,22 @@ export default class UserController {
             statusCode: 200,
             success: true
         })
+    }
+
+    static async uploadProfilePicture(req, res, next) {
+        try {
+            if (!req.file) {
+                return res.status(400).json({
+                    message: 'No file uploaded',
+                    data: {},
+                    statusCode: 400,
+                    success: false
+                })
+            }
+            await userService.uploadProfilePicture(req);
+        } catch (error) {
+
+        }
     }
 
 

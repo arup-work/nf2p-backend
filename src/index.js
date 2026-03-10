@@ -18,6 +18,8 @@ app.use(cors({
 }));
 
 app.use(express.json());
+// Serve static files from 'public' folder
+app.use('/uploads', express.static('public/uploads'));
 
 // Routes
 app.use('/api/v1', Route);
